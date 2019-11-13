@@ -1,42 +1,50 @@
-create table user (
-  id serial integer not null primary key,
-  name varchar(255),
-  email varchar(255),
-  password varchar(255)
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS properties CASCADE;
+DROP TABLE IF EXISTS reservations CASCADE;
+DROP TABLE IF EXISTS property_reviews CASCADE;
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL
 );
 
-create table properties (
-  id serial not null primary key,
-  owner_id integer not null references user(id),
-  title, varchar(255),
-  description text,
-  thumbnail_photo_url varchar(255),
-  cover_photo_url varchar(255);
-  cost_per_night integer,
-  street varchar(255),
-  parking_spaces integer,
-  number_of_bathrooms integer,
-  number_of_bedrooms integer,
-  country varchar(255),
-  city varchar(255),
-  province varchar(255),
-  post_code varchar(255),
-  active boolean,
-)
+CREATE TABLE properties (
+  id SERIAL PRIMARY KEY NOT NULL,
+  owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
 
-create table reservations (
-  id serial not null primary key,
-  start_date date,
-  end_date date,
-  property_id integer references properties(id),
-  guest_id
-)
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  thumbnail_photo_url VARCHAR(255) NOT NULL,
+  cover_photo_url VARCHAR(255) NOT NULL,
+  cost_per_night INTEGER  NOT NULL DEFAULT 0,
+  parking_spaces INTEGER  NOT NULL DEFAULT 0,
+  number_of_bathrooms INTEGER  NOT NULL DEFAULT 0,
+  number_of_bedrooms INTEGER  NOT NULL DEFAULT 0,
 
-create table rates (
-  id serial not null primary key,
-  start_date date
-  end_date date,
-  cost_per_night integer,
-  property_id integer references properties(id)
+  country VARCHAR(255) NOT NULL,
+  street VARCHAR(255) NOT NULL,
+  city VARCHAR(255) NOT NULL,
+  province VARCHAR(255) NOT NULL,
+  post_code VARCHAR(255) NOT NULL,
+
+  active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+CREATE TABLE reservations (
+  id SERIAL PRIMARY KEY NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  property_id INTEGER REFERENCES properties(id) ON DELETE CASCADE,
+  guest_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE property_reviews (
+  id SERIAL PRIMARY KEY NOT NULL,
+  guest_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  property_id INTEGER REFERENCES properties(id) ON DELETE CASCADE,
+  reservation_id INTEGER REFERENCES reservations(id) ON DELETE CASCADE,
+  rating SMALLINT NOT NULL DEFAULT 0,
+  message TEXT
+);
