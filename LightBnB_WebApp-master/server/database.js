@@ -17,23 +17,12 @@ const pool = new Pool({
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithEmail = function(email) {
-  // let user;
-  // for (const userId in users) {
-  //   user = users[userId];
-  //   if (user.email.toLowerCase() === email.toLowerCase()) {
-  //     break;
-  //   } else {
-  //     user = null;
-  //   }
-  // }
-  // return Promise.resolve(user);
-
   return pool.query('SELECT * from users where email = $1;', [email])
-    .then(res => {
-      user = res.rows[0];
-      console.log(user);
-    });
-}
+    .then(
+      res => res.rows[0],
+      rej => null
+    );
+};
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -41,16 +30,14 @@ exports.getUserWithEmail = getUserWithEmail;
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-// const getUserWithId = function(id) {
-//   return Promise.resolve(users[id]);
-// }
 
 const getUserWithId = function(id) {
-  return pool.query('SELECT * FROM users WHERE id = $1;', [id]).then(res => {
-    user = res.rows[0];
-    console.log(user);
-  });
-}
+  return pool.query('SELECT * FROM users WHERE id = $1;', [id]).
+  then(
+    res => res.rows[0],
+    rej => null
+  );
+};
 exports.getUserWithId = getUserWithId;
 
 
@@ -60,17 +47,13 @@ exports.getUserWithId = getUserWithId;
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser = function(user) {
-  // const userId = Object.keys(users).length + 1;
-  // user.id = userId;
-  // users[userId] = user;
-  // return Promise.resolve(user);
   const newUsername = user.name;
   const newUserEmail = user.email;
   const newUserPassword = user.password;
 
   return pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3)', [newUsername, newUserEmail, newUserPassword]).then(res => {
       userAdded = res.rows[0];
-      console.log(userAdded);
+      console.log(`Added to users: ${user.name}`);
     },
     rej => {
       console.log('Unable to add to database');
@@ -86,7 +69,7 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+  return pool.query('SELECT * FROM reservations WHERE guest_id = $1 LIMIT 10;', [guest_id, limit]).then(res => res.row[0], rej => null);
 }
 exports.getAllReservations = getAllReservations;
 
@@ -98,13 +81,6 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-// const getAllProperties = function(options, limit = 10) {
-//   const limitedProperties = {};
-//   for (let i = 1; i <= limit; i++) {
-//     limitedProperties[i] = properties[i];
-//   }
-//   return Promise.resolve(limitedProperties);
-// }
 
 const getAllProperties = function(options, limit = 10) {
   return pool.query(`
@@ -128,11 +104,3 @@ const addProperty = function(property) {
   return Promise.resolve(property);
 }
 exports.addProperty = addProperty;
-
-console.log(getUserWithEmail('tristanjacobs@gmail.com'));
-console.log(getUserWithId('1'));
-console.log(addUser({
-  name: 'Andy Liang',
-  email: 'test@gmail.com',
-  password: 'POOP'
-}));
