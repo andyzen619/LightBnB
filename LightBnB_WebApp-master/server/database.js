@@ -180,3 +180,12 @@ const addProperty = function(property) {
     .then(res => res.row[0]);
 }
 exports.addProperty = addProperty;
+
+module.exports = {
+  getUserWithEmail,
+  getUserWithId,
+  addUser,
+  getAllReservations,
+  getAllProperties,
+  addProperty
+}
